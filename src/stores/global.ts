@@ -3,11 +3,13 @@ const STORAGE_KEY = 'global-store'
 interface GlobalState {
   namespaceCode: string
   appCode: string
+  WorkflowGroupCode: string
 }
 
 const defaultState: GlobalState = {
   namespaceCode: '',
-  appCode: ''
+  appCode: '',
+  WorkflowGroupCode: ''
 }
 
 class GlobalStore {
@@ -37,6 +39,15 @@ class GlobalStore {
 
   setAppCode(appCode: string) {
     this.state.appCode = appCode
+    this.save()
+  }
+
+  getWorkflowGroupCode() {
+    return this.state.WorkflowGroupCode || ''
+  }
+
+  setWorkflowGroupCode(WorkflowGroupCode: string) {
+    this.state.WorkflowGroupCode = WorkflowGroupCode
     this.save()
   }
 

@@ -1,4 +1,5 @@
 import axios from 'axios'
+import qs from 'qs'
 import { message } from 'ant-design-vue'
 import type { AxiosRequestConfig } from 'axios'
 
@@ -6,7 +7,12 @@ export default async function request<T>(url: string, options?: AxiosRequestConf
   return await axios
     .request({
       url: url,
-      ...(options || {})
+      ...(options || {}),
+        paramsSerializer: params =>
+        qs.stringify(params, {
+          arrayFormat: 'brackets',
+          encode: true,
+        }),
     })
     .then((response) => {
       if (response.status >= 200 && response.status < 300) {

@@ -10,24 +10,24 @@
     >
       <a-row :gutter="24">
         <a-col :span="12">
-          <a-form-item name="appCode" label="应用名称">
+          <a-form-item name="workflowGroupCode" label="分组名称">
             <a-select
-              v-model:value="queryFormState.appCode"
+              v-model:value="queryFormState.workflowGroupCode"
               show-search
-              :options="appGroupOptions"
+              :options="workflowGroupOptions"
               :filterOption="false"
-              @change="handleJobGroupChange"
-              @search="fetchAppGroupOptions"
+              @change="handleWorkflowGroupChange"
+              @search="fetchWorkflowGroupOptions"
             />
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item name="jobId" label="任务名称">
+          <a-form-item name="workflowId" label="工作流">
             <a-select
               show-search
               allowClear
-              v-model:value="queryFormState.jobId"
-              :options="jobInfoOptions"
+              v-model:value="queryFormState.workflowId"
+              :options="workflowOptions"
               :filterOption="false"
             />
           </a-form-item>
@@ -35,18 +35,18 @@
       </a-row>
       <a-row :gutter="24">
         <a-col :span="12">
-          <a-form-item name="jobStatus" label="任务状态">
+          <a-form-item name="status" label="实例状态">
             <a-select
               allowClear
               class="w-full"
-              v-model:value="queryFormState.jobStatus"
-              :options="jobStatusOptions"
+              v-model:value="queryFormState.status"
+              :options="workflowStatusOptions"
             />
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item name="jobInstanceId" label="任务实例id">
-            <a-input v-model:value="queryFormState.jobInstanceId"></a-input>
+          <a-form-item name="workflowInstanceId" label="实例id">
+            <a-input v-model:value="queryFormState.workflowInstanceId"></a-input>
           </a-form-item>
         </a-col>
       </a-row>
@@ -57,7 +57,7 @@
             <a-range-picker
               allowClear
               class="w-full"
-              valueFormat="YYYY-MM-DD HH:mm:ss"
+              valueFormat="YYYY-MM-DD"
               v-model:value="queryFormState.startAtRange"
             />
           </a-form-item>
@@ -67,7 +67,7 @@
             <a-range-picker
               allowClear
               class="w-full"
-              valueFormat="YYYY-MM-DD HH:mm:ss"
+              valueFormat="YYYY-MM-DD"
               v-model:value="queryFormState.endAtRange"
             />
           </a-form-item>
@@ -91,49 +91,20 @@
         @change="handleTableChange"
       >
         <template #bodyCell="{ column, record }">
-          <template v-if="column.dataIndex === 'jobType&processor'">
-            <div>{{ record.jobType.label }}</div>
-
-            <a-typography-text
-              v-if="record.jobType.code === 'JAVA'"
-              :style="{ width: '150px' }"
-              :ellipsis="{ tooltip: record.processor }"
-              v-model:content="record.processor"
-            >
-            </a-typography-text>
-          </template>
-
           <template v-if="column.dataIndex === 'operation'">
-            <span
-              class="mr-1 text-blue-500 cursor-pointer"
-              @click="jobInstanceDetailModalRef.openModal(record.id)"
-            >
+            <span class="mr-1 text-blue-500 cursor-pointer" @click="goToDetailView(record.id)">
               详情
             </span>
             <a-dropdown v-if="record.showMoreAction" class="mr-1 text-blue-500 cursor-pointer">
               <span>更多</span>
               <template #overlay>
                 <a-menu>
-                  <a-menu-item v-if="record.jobStatus.code == 'FAILED'">
-                    <div
-                      class="text-blue-500"
-                      @click="jobInstanceMessageModalRef.openModal(record)"
-                    >
-                      异常信息
-                    </div>
-                  </a-menu-item>
                   <a-menu-item
-                    v-if="['SUCCESS', 'FAILED', 'CANCELED'].includes(record.jobStatus.code)"
+                    v-if="['SUCCESS', 'FAILED', 'CANCELED'].includes(record.status.code)"
                   >
                     <div class="text-blue-500" @click="handleRetry(record)">重跑任务</div>
                   </a-menu-item>
-                  <a-menu-item
-                    v-if="
-                      ['WAITING_DISPATCH', 'DISPATCHING', 'PENDING', 'PROCESSING'].includes(
-                        record.jobStatus.code
-                      )
-                    "
-                  >
+                  <a-menu-item v-if="['WAITING', 'RUNNING'].includes(record.status.code)">
                     <div class="text-blue-500" @click="handleTerminateJob(record)">终止任务</div>
                   </a-menu-item>
                 </a-menu>
@@ -143,43 +114,36 @@
         </template>
       </a-table>
     </div>
-
-    <JobInstanceDetailModal ref="jobInstanceDetailModalRef" />
-    <JobInstanceMessageModal ref="jobInstanceMessageModalRef" />
   </div>
 </template>
 
 <script setup>
 import { Modal, message } from 'ant-design-vue'
 import { reactive, ref, h, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
-import { listAppGroup } from '@/service/api/appGroupApi'
-import {
-  listJobInstance,
-  terminateJobInstance,
-  retryJobInstance
-} from '@/service/api/jobInstanceApi'
+import { listWorkflowInstance, retryWorkflowInstance } from '@/service/api/workflowInstanceApi'
+import { terminateWorkflowInstance } from '@/service/api/workflowInstanceApi'
 import { listMetadata } from '@/service/api/metadataApi'
-import { listJobInfo } from '@/service/api/jobInfoApi'
 import { buildMetadataOptions } from '@/utils/metadataUtils'
 import requestForPage from '@/utils/pageRequest'
-import JobInstanceDetailModal from '@/components/JobInstanceDetailModal.vue'
-import JobInstanceMessageModal from '@/components/JobInstanceMessageModal.vue'
 import { globalStore } from '@/stores/global'
+import { listWorkflowGroup } from '@/service/api/workflowGroupApi'
+import { listWorkflow } from '@/service/api/workflowApi'
 
-const [jobInstanceMessageModalRef, jobInstanceDetailModalRef] = [ref(), ref()]
-
+const route = useRoute()
+const router = useRouter()
 const queryFormRef = ref()
 const queryFormState = reactive({})
 
 const columns = [
   {
-    title: '任务实例id',
+    title: '实例id',
     dataIndex: 'id'
   },
   {
-    title: '任务名称',
-    dataIndex: 'jobName',
+    title: '实例名称',
+    dataIndex: 'name',
     ellipsis: true
   },
   {
@@ -187,12 +151,8 @@ const columns = [
     dataIndex: 'appName'
   },
   {
-    title: '任务类型/处理器',
-    dataIndex: 'jobType&processor'
-  },
-  {
     title: '任务状态',
-    dataIndex: ['jobStatus', 'label']
+    dataIndex: ['status', 'label']
   },
   {
     title: '开始时间',
@@ -208,20 +168,21 @@ const columns = [
   }
 ]
 
-const appGroupOptions = ref([])
-const jobInfoOptions = ref([])
-const jobStatusOptions = ref([])
+const workflowGroupOptions = ref([])
+const workflowOptions = ref([])
+const workflowStatusOptions = ref([])
 const dataSource = ref([])
 
 const { run, loading, current, pagination, pageSize } = requestForPage(
-  async (params) => listJobInstance(params),
+  async (params) => listWorkflowInstance(params),
   {
     onSuccess: (data) => {
       let content = data.content
       for (let item of content) {
-        item.showMoreAction = item.jobStatus.code != 'WAITING_SCHEDULE'
+        item.showMoreAction = item.status.code != 'WAITING_SCHEDULE'
       }
       dataSource.value = content
+      console.log('dataSource.value:', dataSource.value)
     }
   }
 )
@@ -239,17 +200,16 @@ const handleTableChange = (page, filters, sorter) => {
   })
 }
 
-const fetchJobInstance = async () => {
-  const { appCode, jobId, jobInstanceId, jobStatus, processor, startAtRange, endAtRange } =
+const fetchWorkflowInstance = async () => {
+  const { workflowGroupCode, workflowId, workflowInstanceId, status, startAtRange, endAtRange } =
     queryFormState
   const namespaceCode = globalStore.getNamespaceCode()
   run({
     namespaceCode,
-    appCode,
-    jobId,
-    jobInstanceId,
-    jobStatus,
-    processor,
+    workflowGroupCode,
+    workflowId,
+    workflowInstanceId,
+    status,
     startAtRange,
     endAtRange,
     pageNo: current.value,
@@ -258,64 +218,73 @@ const fetchJobInstance = async () => {
 }
 
 const onFinish = (values) => {
-  fetchJobInstance()
+  fetchWorkflowInstance()
 }
 
-const handleJobGroupChange = (value) => {
-  globalStore.setAppCode(value)
-  fetchJobInfo(value)
+const handleWorkflowGroupChange = (value) => {
+  globalStore.setWorkflowGroupCode(value)
+  fetchWorkflow(value)
 }
 
-const fetchJobInfo = async (appCode) => {
+const fetchWorkflow = async (workflowGroupCode) => {
   const namespaceCode = globalStore.getNamespaceCode()
-  let jobInfoPage = await listJobInfo({
+  let workflowPage = await listWorkflow({
     namespaceCode,
-    appCode,
+    workflowGroupCode,
     pageNo: 1,
     pageSize: 10
   })
-  jobInfoOptions.value = jobInfoPage.content.map((it) => {
+  workflowOptions.value = workflowPage.content.map((it) => {
     return {
-      label: it.jobName,
+      label: it.name,
       value: it.id
     }
   })
 }
 
-const fetchAppGroupOptions = async (searchText) => {
+const fetchWorkflowGroupOptions = async (searchText) => {
   const namespaceCode = globalStore.getNamespaceCode()
-  let jobGroupPage = await listAppGroup({
+  let workflowGroupPage = await listWorkflowGroup({
     namespaceCode,
     name: searchText,
     pageNo: 1,
     pageSize: 10
   })
-  appGroupOptions.value = jobGroupPage.content.map((it) => {
+  workflowGroupOptions.value = workflowGroupPage.content.map((it) => {
     return {
       label: it.name,
       value: it.code
     }
   })
-  appGroupOptions.value.unshift({
-    label: '全部应用',
-    value: ''
+  if (!searchText) {
+    workflowGroupOptions.value.unshift({
+      label: '全部分组',
+      value: ''
+    })
+  }
+}
+
+const goToDetailView = (workflowInstanceId) => {
+  router.push({
+    name: '工作流实例详情',
+    query: { workflowInstanceId }
   })
 }
 
 const handleRetry = async (record) => {
   Modal.confirm({
-    title: `确认重跑任务`,
+    title: `确认重跑工作流任务`,
     content: h('div', [
       h('span', `确定要重跑 `),
-      h('span', { class: 'font-semibold text-blue-500' }, record.jobName),
+      h('span', { class: 'font-semibold text-blue-500' }, record.name),
       h('span', ' ?')
     ]),
     okText: '确定',
     cancelText: '取消',
     onOk: async () => {
-      await retryJobInstance({ jobInstanceId: record.id })
+      await retryWorkflowInstance({ workflowInstanceId: record.id })
       message.success('操作成功')
-      fetchJobInstance()
+      fetchWorkflowInstance()
     }
   })
 }
@@ -331,22 +300,22 @@ const handleTerminateJob = async (record) => {
     okText: '确定',
     cancelText: '取消',
     onOk: async () => {
-      await terminateJobInstance({ jobInstanceId: record.id })
+      await terminateWorkflowInstance({ workflowInstanceId: record.id })
       message.success('操作成功')
-      fetchJobInstance()
+      fetchWorkflowInstance()
     }
   })
 }
 
 const initOptions = async () => {
-  queryFormState.appCode = globalStore.getAppCode()
   const metadatas = await listMetadata({
-    metadataCodes: ['JobStatusEnum']
+    metadataCodes: ['WorkflowStatusEnum']
   })
   const options = buildMetadataOptions(metadatas)
-  jobStatusOptions.value = options['JobStatusEnum']
-  fetchAppGroupOptions(null)
-  fetchJobInfo(queryFormState.appCode)
+  queryFormState.workflowGroupCode = globalStore.getWorkflowGroupCode() || ''
+  workflowStatusOptions.value = options['WorkflowStatusEnum']
+  fetchWorkflowGroupOptions('')
+  fetchWorkflow(queryFormState.workflowGroupCode)
 }
 
 onMounted(async () => {
