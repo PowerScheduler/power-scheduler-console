@@ -2,39 +2,43 @@
 /* eslint-disable */
 import request from '@/utils/request'
 
-/** 查询基本信息 GET /api/dashboard/basicInfo */
+/** 查询基本信息 GET /api/v1/dashboard/${param0}/basicInfo */
 export async function queryBasicInfo(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
   params: API.queryBasicInfoParams,
   options?: { [key: string]: any }
 ) {
+  const { namespaceCode: param0, ...queryParams } = params
   return request<API.ResponseWrapperDashboardBasicInfoQueryResponseDTO>(
-    `/api/dashboard/basicInfo`,
+    `/api/v1/dashboard/${param0}/basicInfo`,
     {
       method: 'GET',
       params: {
-        ...params,
+        ...queryParams,
         param: undefined,
-        ...params['param']
+        ...queryParams['param']
       },
       ...(options || {})
     }
   )
 }
 
-/** 查询统计信息 POST /api/dashboard/statisticsInfo */
+/** 查询统计信息 GET /api/v1/dashboard/${param0}/statisticsInfo */
 export async function queryStatisticsInfo(
-  body: API.DashboardStatisticsInfoQueryRequestDTO,
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.queryStatisticsInfoParams,
   options?: { [key: string]: any }
 ) {
+  const { namespaceCode: param0, ...queryParams } = params
   return request<API.ResponseWrapperDashboardStatisticsInfoQueryResponseDTO>(
-    `/api/dashboard/statisticsInfo`,
+    `/api/v1/dashboard/${param0}/statisticsInfo`,
     {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
+      method: 'GET',
+      params: {
+        ...queryParams,
+        param: undefined,
+        ...queryParams['param']
       },
-      data: body,
       ...(options || {})
     }
   )

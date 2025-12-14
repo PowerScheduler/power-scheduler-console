@@ -160,7 +160,7 @@ import {
   retryJobInstance
 } from '@/service/api/jobInstanceApi'
 import { listMetadata } from '@/service/api/metadataApi'
-import { listJobInfo } from '@/service/api/jobInfoApi'
+import { listJob } from '@/service/api/jobApi'
 import { buildMetadataOptions } from '@/utils/metadataUtils'
 import requestForPage from '@/utils/pageRequest'
 import JobInstanceDetailModal from '@/components/JobInstanceDetailModal.vue'
@@ -268,7 +268,7 @@ const handleJobGroupChange = (value) => {
 
 const fetchJobInfo = async (appCode) => {
   const namespaceCode = globalStore.getNamespaceCode()
-  let jobInfoPage = await listJobInfo({
+  let jobInfoPage = await listJob({
     namespaceCode,
     appCode,
     pageNo: 1,

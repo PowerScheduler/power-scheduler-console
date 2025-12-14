@@ -113,7 +113,7 @@ import { reactive, ref, onMounted, h } from 'vue'
 
 import requestForPage from '@/utils/pageRequest'
 import { listAppGroup } from '@/service/api/appGroupApi'
-import { listJobInfo, removeJobInfo, switchEnable } from '@/service/api/jobInfoApi'
+import { listJob, removeJob, switchJobStatus } from '@/service/api/jobApi'
 
 import JobRunOnceModal from '@/components/JobRunOnceModal.vue'
 import JobInfoSaveModal from '@/components/JobInfoSaveModal.vue'
@@ -160,7 +160,7 @@ let lastQueryParam = null
 
 const query = async (params) => {
   lastQueryParam = params
-  return listJobInfo(params)
+  return listJob(params)
 }
 
 const { run, loading, current, pageSize, pagination, handleTableChange } = requestForPage(query, {
@@ -208,7 +208,7 @@ const showDeleteConfirm = (record) => {
     okText: '确定',
     cancelText: '取消',
     onOk: async () => {
-      await removeJobInfo({
+      await removeJob({
         jobId: record.id
       })
       const namespaceCode = globalStore.getNamespaceCode()
@@ -233,10 +233,7 @@ const handleSwitchEnable = async (record) => {
     okText: '确定',
     cancelText: '取消',
     onOk: async () => {
-      await switchEnable({
-        jobId: record.id,
-        enabled: !record.enabled
-      })
+      await switchJobStatus({ jobId: record.id }, { enabled: !record.enabled })
       const namespaceCode = globalStore.getNamespaceCode()
       run({
         ...lastQueryParam,

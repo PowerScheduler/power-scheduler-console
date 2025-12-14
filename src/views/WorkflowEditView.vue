@@ -143,12 +143,14 @@ const handleSave = async () => {
   console.log('导出图形数据:', graphData)
 
   if (workflowId) {
-    await editWorkflow({
-      workflowId,
-      ...currentWorkflow,
-      nodes: graphData.filter((it) => it.shape === 'workflow-node').map((it) => it.data),
-      graphData: JSON.stringify(graphData)
-    })
+    await editWorkflow(
+      { workflowId: workflowId },
+      {
+        ...currentWorkflow,
+        nodes: graphData.filter((it) => it.shape === 'workflow-node').map((it) => it.data),
+        graphData: JSON.stringify(graphData)
+      }
+    )
     message.success('操作成功')
   } else {
     const returnWorkflowId = await addWorkflow({

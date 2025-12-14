@@ -55,7 +55,7 @@ const handleSave = async () => {
   if (saveMode.value === 'add') {
     await addNamespace({ ...currentNamespace })
   } else {
-    await editNamespace(currentNamespace)
+    await editNamespace({ namespaceId: currentNamespace.id }, currentNamespace)
   }
   visibility.value = false
   formRef.value.resetFields()

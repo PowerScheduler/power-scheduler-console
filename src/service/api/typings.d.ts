@@ -6,7 +6,6 @@ declare namespace API {
   }
 
   type AppGroupEditRequestDTO = {
-    id: number
     name?: string
   }
 
@@ -46,7 +45,6 @@ declare namespace API {
   }
 
   type DashboardStatisticsInfoQueryRequestDTO = {
-    namespaceCode?: string
     appCode?: string
     scheduleAtRange: string[]
   }
@@ -61,6 +59,26 @@ declare namespace API {
     workflowId: number
   }
 
+  type editAppGroupParams = {
+    appGroupId: number
+  }
+
+  type editJobParams = {
+    jobId: number
+  }
+
+  type editNamespaceParams = {
+    namespaceId: number
+  }
+
+  type editWorkflowGroupParams = {
+    workflowGroupId: number
+  }
+
+  type editWorkflowParams = {
+    workflowId: number
+  }
+
   type EnumDTO = {
     code?: string
     label?: string
@@ -70,12 +88,12 @@ declare namespace API {
     jobInstanceId: number
   }
 
-  type getJobInfoParams = {
-    jobId: number
+  type getJobInstanceParams = {
+    jobInstanceId: number
   }
 
-  type getJobInstanceDetailParams = {
-    jobInstanceId: number
+  type getJobParams = {
+    jobId: number
   }
 
   type getWorkflowInstanceParams = {
@@ -139,7 +157,6 @@ declare namespace API {
   }
 
   type JobInfoEditRequestDTO = {
-    jobId: number
     jobName?: string
     jobDesc?: string
     scheduleType: 'CRON' | 'FIX_RATE' | 'FIX_DELAY' | 'ONE_TIME'
@@ -266,7 +283,6 @@ declare namespace API {
   type JobProgressQueryRequestDTO = {
     pageNo: number
     pageSize: number
-    jobInstanceId: number
   }
 
   type JobProgressQueryResponseDTO = {
@@ -280,15 +296,25 @@ declare namespace API {
   }
 
   type JobRunRequestDTO = {
-    jobId: number
     workerAddress?: string
     executeParams?: string
     dataTime?: string
   }
 
   type JobSwitchRequestDTO = {
-    jobId: number
     enabled: boolean
+  }
+
+  type listAppGroupParams = {
+    param: AppGroupQueryRequestDTO
+  }
+
+  type listJobInstanceParams = {
+    param: JobInstanceQueryRequestDTO
+  }
+
+  type listJobParams = {
+    param: JobInfoQueryRequestDTO
   }
 
   type listMetadataParams = {
@@ -301,6 +327,10 @@ declare namespace API {
 
   type listWorkerParams = {
     param?: WorkerQueryRequestDTO
+  }
+
+  type listWorkflowGroupParams = {
+    param?: WorkflowGroupQueryRequestDTO
   }
 
   type listWorkflowInstanceParams = {
@@ -323,7 +353,6 @@ declare namespace API {
   }
 
   type NamespaceEditRequestDTO = {
-    id: number
     name?: string
     description?: string
   }
@@ -412,14 +441,26 @@ declare namespace API {
   }
 
   type queryBasicInfoParams = {
+    namespaceCode: string
     param?: DashboardBasicInfoQueryRequestDTO
   }
 
+  type queryProgressParams = {
+    jobInstanceId: number
+    param?: JobProgressQueryRequestDTO
+  }
+
+  type queryStatisticsInfoParams = {
+    namespaceCode: string
+    param?: DashboardStatisticsInfoQueryRequestDTO
+  }
+
   type queryWorkflowNodeInstanceProgressParams = {
+    workflowInstanceId: number
     param?: WorkflowNodeInstanceProgressQueryRequestDTO
   }
 
-  type removeJobInfoParams = {
+  type removeJobParams = {
     jobId: number
   }
 
@@ -850,6 +891,22 @@ declare namespace API {
     workflowInstanceId: number
   }
 
+  type runJobParams = {
+    jobId: number
+  }
+
+  type runWorkflowParams = {
+    workflowId: number
+  }
+
+  type switchJobStatusParams = {
+    jobId: number
+  }
+
+  type switchWorkflowStatusParams = {
+    workflowId: number
+  }
+
   type terminateJobInstanceParams = {
     jobInstanceId: number
   }
@@ -902,7 +959,6 @@ declare namespace API {
 
   type WorkflowEditRequestDTO = {
     nodes: WorkflowNodeDTO[]
-    workflowId: number
     name?: string
     description?: string
     scheduleType: 'CRON' | 'FIX_RATE' | 'FIX_DELAY' | 'ONE_TIME'
@@ -920,14 +976,13 @@ declare namespace API {
   }
 
   type WorkflowGroupEditRequestDTO = {
-    id: number
     name?: string
   }
 
   type WorkflowGroupQueryRequestDTO = {
     namespaceCode?: string
-    code?: string
-    name?: string
+    workflowGroupCode?: string
+    workflowGroupName?: string
   }
 
   type WorkflowGroupQueryResponseDTO = {
@@ -1026,7 +1081,6 @@ declare namespace API {
   type WorkflowNodeInstanceProgressQueryRequestDTO = {
     pageNo: number
     pageSize: number
-    workflowNodeInstanceId: number
   }
 
   type WorkflowQueryRequestDTO = {
@@ -1050,12 +1104,10 @@ declare namespace API {
   }
 
   type WorkflowRunRequestDTO = {
-    workflowId: number
     dataTime?: string
   }
 
   type WorkflowSwitchRequestDTO = {
-    workflowId: number
     enabled: boolean
   }
 }

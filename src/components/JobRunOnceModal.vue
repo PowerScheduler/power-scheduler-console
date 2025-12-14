@@ -45,7 +45,7 @@ import dayjs from 'dayjs'
 import { ref } from 'vue'
 import { message } from 'ant-design-vue'
 import { listWorker } from '@/service/api/workerApi'
-import { run } from '@/service/api/jobInfoApi'
+import { runJob } from '@/service/api/jobApi'
 
 const selectedWorker = ref(null)
 const workerOptions = ref([])
@@ -55,12 +55,14 @@ const executeParams = ref('')
 const dateTime = ref(null)
 
 const handleRunOnce = async () => {
-  await run({
-    jobId: currentJobInfo.value.id,
-    executeParams: executeParams.value,
-    dataTime: dateTime.value.format('YYYY-MM-DD HH:mm:ss'),
-    workerAddress: selectedWorker.value
-  })
+  await runJob(
+    { jobId: currentJobInfo.value.id },
+    {
+      executeParams: executeParams.value,
+      dataTime: dateTime.value.format('YYYY-MM-DD HH:mm:ss'),
+      workerAddress: selectedWorker.value
+    }
+  )
   message.success('操作成功')
   visibility.value = false
 }

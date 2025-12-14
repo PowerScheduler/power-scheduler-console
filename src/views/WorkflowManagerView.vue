@@ -5,7 +5,7 @@
         <a-col :span="8">
           <a-form-item name="workflowGroupCode" label="工作流分组">
             <a-select
-              v-model:value="queryFormState.code"
+              v-model:value="queryFormState.workflowGroupCode"
               show-search
               allowClear
               :options="workflowGroupOptions"
@@ -107,7 +107,7 @@ import { reactive, ref, onMounted, h } from 'vue'
 import { useRouter } from 'vue-router'
 
 import requestForPage from '@/utils/pageRequest'
-import { listWorkflow, switchWorkflowEnable, deleteWorkflow } from '@/service/api/workflowApi'
+import { listWorkflow, switchWorkflowStatus, deleteWorkflow } from '@/service/api/workflowApi'
 import WorkflowRunOnceModal from '@/components/WorkflowRunOnceModal.vue'
 import { globalStore } from '@/stores/global'
 import { listWorkflowGroup } from '@/service/api/workflowGroupApi'
@@ -180,16 +180,6 @@ const goToEditor = (record) => {
   })
 }
 
-const onSubmitSuccess = async () => {
-  const namespaceCode = globalStore.getNamespaceCode()
-  run({
-    ...lastQueryParam,
-    namespaceCode,
-    pageNo: pagination.value.current,
-    pageSize: pagination.value.pageSize
-  })
-}
-
 const showDeleteConfirm = (record) => {
   Modal.confirm({
     title: '删除确认',
@@ -227,10 +217,7 @@ const handleSwitchEnable = async (record) => {
     okText: '确定',
     cancelText: '取消',
     onOk: async () => {
-      await switchWorkflowEnable({
-        workflowId: record.id,
-        enabled: !record.enabled
-      })
+      await switchWorkflowStatus({ workflowId: record.id }, { enabled: !record.enabled })
       message.success('操作成功')
       const namespaceCode = globalStore.getNamespaceCode()
       run({
@@ -247,7 +234,7 @@ const fetchWorkflowGroupOptions = async (searchText) => {
   const namespaceCode = globalStore.getNamespaceCode()
   let workflowGroupPage = await listWorkflowGroup({
     namespaceCode,
-    code: searchText,
+    workflowGroupName: searchText || '',
     pageNo: 1,
     pageSize: 10
   })
@@ -257,10 +244,12 @@ const fetchWorkflowGroupOptions = async (searchText) => {
       value: it.code
     }
   })
-  workflowGroupOptions.value.unshift({
-    label: '全部应用',
-    value: ''
-  })
+  if (!searchText) {
+    workflowGroupOptions.value.unshift({
+      label: '全部应用',
+      value: ''
+    })
+  }
 }
 
 const handleWorkflowGroupChange = (workflowGroupCode) => {
@@ -268,14 +257,14 @@ const handleWorkflowGroupChange = (workflowGroupCode) => {
   const namespaceCode = globalStore.getNamespaceCode()
   run({
     namespaceCode,
-    code: workflowGroupCode,
+    workflowGroupCode: workflowGroupCode,
     pageNo: 1,
     pageSize: pageSize.value
   })
 }
 
 onMounted(() => {
-  queryFormState.code = globalStore.getWorkflowGroupCode()
+  queryFormState.workflowGroupCode = globalStore.getWorkflowGroupCode()
   queryFormState.namespaceCode = globalStore.getNamespaceCode()
   fetchWorkflowGroupOptions()
   run({

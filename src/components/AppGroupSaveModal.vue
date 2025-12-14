@@ -57,7 +57,7 @@ const handleSave = async () => {
     const namespaceCode = globalStore.getNamespaceCode()
     await addAppGroup({ ...currentAppGroup, namespaceCode })
   } else {
-    await editAppGroup(currentAppGroup)
+    await editAppGroup({ appGroupId: currentAppGroup.id }, currentAppGroup)
   }
   visibility.value = false
   formRef.value.resetFields()

@@ -36,10 +36,10 @@ const currentWorkflow = ref({})
 const dateTime = ref(null)
 
 const handleRunOnce = async () => {
-  await runWorkflow({
-    workflowId: currentWorkflow.value.id,
-    dataTime: dateTime.value.format('YYYY-MM-DD HH:mm:ss')
-  })
+  await runWorkflow(
+    { workflowId: currentWorkflow.value.id },
+    { dataTime: dateTime.value.format('YYYY-MM-DD HH:mm:ss') }
+  )
   message.success('操作成功')
   visibility.value = false
 }

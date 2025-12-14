@@ -2,12 +2,32 @@
 /* eslint-disable */
 import request from '@/utils/request'
 
-/** 新建工作流分组 POST /api/workflowGroups/add */
+/** 查工作流分组 GET /api/v1/workflowGroups/ */
+export async function listWorkflowGroup(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.listWorkflowGroupParams,
+  options?: { [key: string]: any }
+) {
+  return request<API.ResponseWrapperPageDTOWorkflowGroupQueryResponseDTO>(
+    `/api/v1/workflowGroups/`,
+    {
+      method: 'GET',
+      params: {
+        ...params,
+        param: undefined,
+        ...params['param']
+      },
+      ...(options || {})
+    }
+  )
+}
+
+/** 新建工作流分组 POST /api/v1/workflowGroups/ */
 export async function addWorkflowGroup(
   body: API.WorkflowGroupAddRequestDTO,
   options?: { [key: string]: any }
 ) {
-  return request<API.ResponseWrapperLong>(`/api/workflowGroups/add`, {
+  return request<API.ResponseWrapperLong>(`/api/v1/workflowGroups/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -17,35 +37,21 @@ export async function addWorkflowGroup(
   })
 }
 
-/** 编辑工作流分组 POST /api/workflowGroups/edit */
+/** 编辑工作流分组 PUT /api/v1/workflowGroups/${param0} */
 export async function editWorkflowGroup(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.editWorkflowGroupParams,
   body: API.WorkflowGroupEditRequestDTO,
   options?: { [key: string]: any }
 ) {
-  return request<API.ResponseWrapperUnit>(`/api/workflowGroups/edit`, {
-    method: 'POST',
+  const { workflowGroupId: param0, ...queryParams } = params
+  return request<API.ResponseWrapperUnit>(`/api/v1/workflowGroups/${param0}`, {
+    method: 'PUT',
     headers: {
       'Content-Type': 'application/json'
     },
+    params: { ...queryParams },
     data: body,
     ...(options || {})
   })
-}
-
-/** 查工作流分组 POST /api/workflowGroups/list */
-export async function listWorkflowGroup(
-  body: API.WorkflowGroupQueryRequestDTO,
-  options?: { [key: string]: any }
-) {
-  return request<API.ResponseWrapperPageDTOWorkflowGroupQueryResponseDTO>(
-    `/api/workflowGroups/list`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      data: body,
-      ...(options || {})
-    }
-  )
 }

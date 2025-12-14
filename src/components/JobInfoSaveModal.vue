@@ -247,7 +247,7 @@ import { message, Modal } from 'ant-design-vue'
 import { buildMetadataOptions } from '@/utils/metadataUtils'
 import { listMetadata } from '@/service/api/metadataApi'
 import { parseCron } from '@/service/api/toolApi'
-import { getJobInfo, addJobInfo, editJobInfo } from '@/service/api/jobInfoApi'
+import { getJob, addJob, editJob } from '@/service/api/jobApi'
 import { globalStore } from '@/stores/global'
 
 const steps = [
@@ -313,7 +313,7 @@ const openModal = async (appCode, jobId) => {
   if (jobId) {
     saveMode.value = 'edit'
     title.value = '编辑任务'
-    const jobInfoDetail = await getJobInfo({ jobId: jobId })
+    const jobInfoDetail = await getJob({ jobId: jobId })
     Object.assign(currentJobInfo, jobInfoDetail)
   } else {
     saveMode.value = 'add'
@@ -350,7 +350,7 @@ const onSubmit = async () => {
   }
   if (saveMode.value == 'add') {
     const namespaceCode = globalStore.getNamespaceCode()
-    await addJobInfo({
+    await addJob({
       ...currentJobInfo,
       namespaceCode,
       executeMode: currentJobInfo.executeMode.code,
@@ -363,16 +363,19 @@ const onSubmit = async () => {
       enable: false
     })
   } else {
-    await editJobInfo({
-      ...currentJobInfo,
-      executeMode: currentJobInfo.executeMode.code,
-      scheduleType: currentJobInfo.scheduleType.code,
-      jobType: currentJobInfo.jobType.code,
-      scriptType: currentJobInfo.scriptType.code,
-      retentionPolicy: currentJobInfo.retentionPolicy.code,
-      retentionValue: currentJobInfo.retentionValue,
-      jobId: currentJobInfo.id
-    })
+    await editJob(
+      { jobId: currentJobInfo.id },
+      {
+        ...currentJobInfo,
+        executeMode: currentJobInfo.executeMode.code,
+        scheduleType: currentJobInfo.scheduleType.code,
+        jobType: currentJobInfo.jobType.code,
+        scriptType: currentJobInfo.scriptType.code,
+        retentionPolicy: currentJobInfo.retentionPolicy.code,
+        retentionValue: currentJobInfo.retentionValue,
+        jobId: currentJobInfo.id
+      }
+    )
   }
   visibility.value = false
   message.success('保存成功')

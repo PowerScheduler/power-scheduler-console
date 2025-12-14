@@ -1,5 +1,11 @@
 <template>
-  <a-drawer v-model:open="visibility" title="任务详情" size="large" placement="right" @close="handleClose">
+  <a-drawer
+    v-model:open="visibility"
+    title="任务详情"
+    size="large"
+    placement="right"
+    @close="handleClose"
+  >
     <a-tabs v-model:activeKey="activeTagKey" type="card" @change="handleChangeTag">
       <a-tab-pane key="basicInfo" tab="基本信息">
         <div class="h-[350px] leading-normal">
@@ -24,8 +30,11 @@
             <template v-if="currentJobInstanceDetail.jobType?.code == 'JAVA'">
               <a-col :span="6">任务处理器</a-col>
               <a-col :span="6">
-                <a-typography-paragraph style="margin-bottom: 0px" :ellipsis="true"
-                  :content="currentJobInstanceDetail.processor" />
+                <a-typography-paragraph
+                  style="margin-bottom: 0px"
+                  :ellipsis="true"
+                  :content="currentJobInstanceDetail.processor"
+                />
               </a-col>
             </template>
             <template v-else-if="currentJobInstanceDetail.jobType?.code == 'SCRIPT'">
@@ -77,8 +86,12 @@
           <a-row class="mb-2" v-if="currentJobInstanceDetail.jobType?.code == 'SCRIPT'">
             <a-col :span="6">脚本代码</a-col>
             <a-col :span="18">
-              <a-typography-paragraph copyable code :ellipsis="{ rows: 4 }"
-                :content="currentJobInstanceDetail.scriptCode" />
+              <a-typography-paragraph
+                copyable
+                code
+                :ellipsis="{ rows: 4 }"
+                :content="currentJobInstanceDetail.scriptCode"
+              />
             </a-col>
           </a-row>
 
@@ -87,22 +100,41 @@
             <a-col :span="18">
               <pre class="max-h-36">
       {{ currentJobInstanceDetail.result }}
-    </pre>
+    </pre
+              >
             </a-col>
           </a-row>
         </div>
       </a-tab-pane>
-      <a-tab-pane key="progressInfo" tab="任务进度" v-if="currentJobInstanceDetail?.executeMode?.code != 'SINGLE'">
-        <a-table :columns="columns" :row-key="(record) => record.id" :data-source="dataSource" :pagination="pagination"
-          :loading="loading" @change="handleTableChange">
+      <a-tab-pane
+        key="progressInfo"
+        tab="任务进度"
+        v-if="currentJobInstanceDetail?.executeMode?.code != 'SINGLE'"
+      >
+        <a-table
+          :columns="columns"
+          :row-key="(record) => record.id"
+          :data-source="dataSource"
+          :pagination="pagination"
+          :loading="loading"
+          @change="handleTableChange"
+        >
           <template #bodyCell="{ column, record }">
-            <template v-if="
-              Array.isArray(column.dataIndex) && column.dataIndex.join('.') === 'taskStatus.label'
-            ">
+            <template
+              v-if="
+                Array.isArray(column.dataIndex) && column.dataIndex.join('.') === 'taskStatus.label'
+              "
+            >
               <span className="inline-flex items-center text-sm text-gray-800">
-                <CheckCircleTwoTone v-if="record.taskStatus.code == 'SUCCESS'" two-tone-color="#52c41a" />
+                <CheckCircleTwoTone
+                  v-if="record.taskStatus.code == 'SUCCESS'"
+                  two-tone-color="#52c41a"
+                />
 
-                <ExclamationCircleTwoTone v-else-if="record.taskStatus.code == 'FAILED'" two-tone-color="#ff4d4f" />
+                <ExclamationCircleTwoTone
+                  v-else-if="record.taskStatus.code == 'FAILED'"
+                  two-tone-color="#ff4d4f"
+                />
 
                 <SyncOutlined v-else spin class="text-blue-500" />
                 <span class="ml-2">{{ record.taskStatus.label }}</span>
@@ -119,7 +151,7 @@
 </template>
 
 <script setup>
-import { getJobInstanceDetail, queryProgress } from '@/service/api/jobInstanceApi'
+import { getJobInstance, queryProgress } from '@/service/api/jobInstanceApi'
 import { reactive, ref } from 'vue'
 import requestForPage from '@/utils/pageRequest'
 import { CheckCircleTwoTone, ExclamationCircleTwoTone, SyncOutlined } from '@ant-design/icons-vue'
@@ -150,7 +182,7 @@ const columns = [
 
 const openModal = async (jobInstanceId) => {
   visibility.value = true
-  const queryResult = await getJobInstanceDetail({ jobInstanceId })
+  const queryResult = await getJobInstance({ jobInstanceId })
   Object.assign(currentJobInstanceDetail, queryResult)
 }
 
