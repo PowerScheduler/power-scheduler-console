@@ -4,7 +4,7 @@
 
     <div class="tool-bar mt-4">
       <a-tooltip title="内容居中">
-        <a-button type="text" :icon="h(PlusSquareOutlined)" @click=graphCenterContent() />
+        <a-button type="text" :icon="h(PlusSquareOutlined)" @click="graphCenterContent()" />
       </a-tooltip>
       <a-tooltip title="放大">
         <a-button type="text" :icon="h(ZoomInOutlined)" @click="graphZoom(0.2)" />
@@ -17,8 +17,10 @@
     <div class="app-content relative">
       <div id="container"></div>
       <TeleportContainer />
-      <div class="absolute top-1 right-1 h-[98%] w-[500px] bg-white shadow-lg border-l z-50 p-4 overflow-y-auto"
-        v-show="showEditPane"></div>
+      <div
+        class="absolute top-1 right-1 h-[98%] w-[500px] bg-white shadow-lg border-l z-50 p-4 overflow-y-auto"
+        v-show="showEditPane"
+      ></div>
     </div>
   </div>
 </template>
@@ -62,7 +64,7 @@ const portAttr = {
 // 注册自定义 Vue 节点
 register({
   shape: 'workflow-node-instance',
-  width: 180,
+  width: 250,
   height: 42,
   component: WorkflowNodeInstance,
   ports: {
@@ -151,7 +153,7 @@ const { run: pollingProgress, cancel: cancelPolling } = useRequest(
       workflowInstanceId: Number(params.workflowInstanceId)
     })
     currentWorkflowInstance.value = workflowInstance
-    console.log('当前工作流实例:', currentWorkflowInstance.value)
+    // console.log('当前工作流实例:', currentWorkflowInstance.value)
     const graph = graphHolder.value
     graph.fromJSON(JSON.parse(workflowInstance.graphData))
     if (['SUCCESS', 'FAILED', 'CANCELED'].includes(workflowInstance.status)) {
@@ -237,14 +239,15 @@ onMounted(async () => {
     },
     background: {
       color: '#F2F7FA'
-    },
+    }
   })
     .use(
       new Selection({
         enabled: true,
         multiple: true,
         rubberband: true,
-        showNodeSelectionBox: true,
+        // showNodeSelectionBox: true,
+        showEdgeSelectionBox: true,
         modifiers: 'shift'
       })
     )
@@ -295,7 +298,6 @@ onMounted(async () => {
     const workflowInstance = await pollingProgress({
       workflowInstanceId: Number(workflowInstanceId)
     })
-
   }
 })
 </script>

@@ -5,7 +5,7 @@
         <a-button type="text" :icon="h(PlusOutlined)" @click="openEditPane(null)" />
       </a-tooltip>
       <a-tooltip title="内容居中">
-        <a-button type="text" :icon="h(PlusSquareOutlined)" @click=graphCenterContent() />
+        <a-button type="text" :icon="h(PlusSquareOutlined)" @click="graphCenterContent()" />
       </a-tooltip>
       <a-tooltip title="放大">
         <a-button type="text" :icon="h(ZoomInOutlined)" @click="graphZoom(0.2)" />
@@ -18,8 +18,10 @@
     <div class="app-content relative">
       <div id="container"></div>
       <TeleportContainer />
-      <div class="absolute top-1 right-1 h-[98%] w-[500px] bg-white shadow-lg border-l z-50 p-4 overflow-y-auto"
-        v-show="showEditPane">
+      <div
+        class="absolute top-1 right-1 h-[98%] w-[500px] bg-white shadow-lg border-l z-50 p-4 overflow-y-auto"
+        v-show="showEditPane"
+      >
         <WorkflowNodeEditPanel ref="showEditPaneRef" @onSubmitSuccess="handleSaveNode" />
       </div>
     </div>
@@ -36,7 +38,12 @@ import { Keyboard } from '@antv/x6-plugin-keyboard'
 import { History } from '@antv/x6-plugin-history'
 import { Transform } from '@antv/x6-plugin-transform'
 import { Snapline } from '@antv/x6-plugin-snapline'
-import { ZoomInOutlined, ZoomOutOutlined, PlusOutlined, PlusSquareOutlined } from '@ant-design/icons-vue'
+import {
+  ZoomInOutlined,
+  ZoomOutOutlined,
+  PlusOutlined,
+  PlusSquareOutlined
+} from '@ant-design/icons-vue'
 import { DagreLayout, type OutModel } from '@antv/layout'
 import WorkflowNodeEditPanel from './WorkflowNodeEditPanel.vue'
 import { exportJSON } from '@/utils/graphUtils'
@@ -66,7 +73,7 @@ const portAttr = {
 // 注册自定义 Vue 节点
 register({
   shape: 'workflow-node',
-  width: 180,
+  width: 250,
   height: 42,
   component: WorkflowNode,
   ports: {
@@ -254,7 +261,7 @@ onMounted(() => {
     },
     background: {
       color: '#F2F7FA'
-    },
+    }
   })
     .use(
       new Selection({
@@ -335,7 +342,7 @@ onMounted(() => {
   })
 
   graph.on('node:click', ({ node }) => {
-    console.log('点击节点:', node.data)
+    // console.log('点击节点:', node.data)
     openEditPane(node.data)
   })
   graph.on('blank:click', () => {
