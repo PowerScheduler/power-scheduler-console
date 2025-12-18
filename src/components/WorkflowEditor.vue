@@ -175,7 +175,7 @@ const addNode: any = (graph: Graph, x: number, y: number, data: any) => {
       ]
     }
   })
-  node.setData({ ...node.data, uuid: node.id })
+  node.setData({ ...node.data, workflowNodeCode: node.id })
   return node
 }
 
