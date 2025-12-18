@@ -152,7 +152,7 @@ const handleSaveNode = (workflowNode: any) => {
     console.log('新增节点:', workflowNode)
     const x = 100 + Math.floor(Math.random() * 300)
     const y = 100 + Math.floor(Math.random() * 300)
-    const node = addNode(graphHolder.value, x, y, workflowNode)
+    addNode(graphHolder.value, x, y, workflowNode)
   }
   closeEditPane()
 }
