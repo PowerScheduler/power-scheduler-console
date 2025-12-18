@@ -14,8 +14,8 @@
         <CloseCircleOutlined class="text-red-500" />
       </template>
 
-      <span class="ml-2 w-[180px]">{{ currentWorkflowNodeInstance.name }}</span>
-      <span class="text-right">{{ nodeInstanceDuration }}</span>
+      <div class="ml-2 w-[80%] truncate">{{ currentWorkflowNodeInstance.name }}</div>
+      <div class="w-[10%]">{{ nodeInstanceDuration }}</div>
     </div>
   </div>
 </template>
@@ -39,17 +39,18 @@ import {
 const now = ref(dayjs())
 let timer: number | null = null
 
-const commonClass = 'border border-gray-300 bg-white rounded-md shadow-sm p-3 text-xs w-[250px]'
+const commonClass =
+  'border border-gray-300 border-l-4  bg-white rounded-md shadow-sm p-3 text-xs w-[250px]'
 const computedClass = computed(() => {
   switch (currentWorkflowNodeInstance.value.status) {
     case 'WAITING':
-      return `${commonClass} border-l-4 border-l-gray-400`
+      return `${commonClass} border-l-gray-400`
     case 'RUNNING':
-      return `${commonClass} border-l-4 border-l-blue-400`
+      return `${commonClass} border-l-blue-400`
     case 'SUCCESS':
-      return `${commonClass} border-l-4 border-l-green-500`
+      return `${commonClass} border-l-green-500`
     case 'FAILED':
-      return `${commonClass} border-l-4 border-l-red-500`
+      return `${commonClass} border-l-red-500`
     default:
       return commonClass
   }

@@ -1,6 +1,6 @@
 <template>
   <div class="border border-gray-300 bg-white rounded-md shadow-sm p-3 text-xs w-[250px]">
-    <div class="label h-[16px] leading-[16px]">{{ data.name }}</div>
+    <div class="label w-[180px] h-[16px] leading-[16px] truncate">{{ data.name }}</div>
   </div>
 </template>
 
