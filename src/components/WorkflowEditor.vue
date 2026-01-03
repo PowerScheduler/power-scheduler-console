@@ -150,7 +150,9 @@ const handleSaveNode = (workflowNode: any) => {
     node.setData(workflowNode)
   } else {
     console.log('新增节点:', workflowNode)
-    addNode(graphHolder.value, 100, 100, workflowNode)
+    const x = 100 + Math.floor(Math.random() * 300)
+    const y = 100 + Math.floor(Math.random() * 300)
+    addNode(graphHolder.value, x, y, workflowNode)
   }
   closeEditPane()
 }
@@ -173,7 +175,8 @@ const addNode: any = (graph: Graph, x: number, y: number, data: any) => {
       ]
     }
   })
-  node.setData({ ...node.data, uuid: node.id })
+  node.setData({ ...node.data, workflowNodeCode: node.id })
+  return node
 }
 
 const graphCenterContent = () => {

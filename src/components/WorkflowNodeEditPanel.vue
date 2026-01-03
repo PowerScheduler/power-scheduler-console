@@ -193,7 +193,7 @@ const emptyWorkflowNode = {
   jobType: 'JAVA',
   scriptType: 'BASH',
   executeMode: 'SINGLE',
-  uuid: null
+  workflowNodeCode: null
 }
 
 const emit = defineEmits(['onSubmitSuccess'])
@@ -207,9 +207,9 @@ const saveMode = ref('')
 const formRef = ref()
 const visibility = ref(true)
 const currentWorkflowNode = reactive({})
-Object.assign(currentWorkflowNode, emptyWorkflowNode)
 
 const open = async (workflowNode) => {
+  Object.assign(currentWorkflowNode, emptyWorkflowNode)
   visibility.value = true
   fetchAllOptions()
   if (workflowNode) {
@@ -219,7 +219,6 @@ const open = async (workflowNode) => {
   } else {
     saveMode.value = 'add'
     title.value = '新建节点'
-    Object.assign(currentWorkflowNode, emptyWorkflowNode)
   }
 }
 
@@ -229,6 +228,7 @@ const onSubmit = async () => {
   }
   visibility.value = false
   emit('onSubmitSuccess', currentWorkflowNode)
+  Object.assign(currentWorkflowNode, emptyWorkflowNode)
 }
 
 const fetchAllOptions = async () => {
